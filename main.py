@@ -69,9 +69,54 @@ def dec2_2():
     print (valid)
 
 
+def dec3_1():
+    # format 6-11 c: dccxcccccchrcfdckcsc
+    hits = 0
+    current_spot = 0
+    slope = 3
+    hill = []
+    with open('dec3_1.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            hill.append(line.strip())
+
+    for line in hill:
+        if line[current_spot] == '#':
+            hits += 1
+        print (line[:current_spot], line[current_spot], line[current_spot+1:], current_spot, hits)
+        current_spot += slope
+        current_spot = current_spot % len(line)
+
+
+def calculate_slope(hill, slope, skip):
+    current_spot = 0
+    hits = 0
+    for index, line in enumerate(hill):
+        if index % 2 == 1 and skip:
+            continue
+        if line[current_spot] == '#':
+            hits += 1
+        #print (line[:current_spot], line[current_spot], line[current_spot+1:], current_spot, hits)
+        current_spot += slope
+        current_spot = current_spot % len(line)
+    return hits
+
+
+def dec3_2():
+    # format 6-11 c: dccxcccccchrcfdckcsc
+    hill = []
+    with open('dec3_1.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            hill.append(line.strip())
+
+    total = calculate_slope(hill, 1, False)
+    total *= calculate_slope(hill, 3, False)
+    total *= calculate_slope(hill, 5, False)
+    total *= calculate_slope(hill, 7, False)
+    total *= calculate_slope(hill, 1, True)
+
+    print (total)
+
+
 if __name__ == '__main__':
-    #dec1_1()
-    #dec1_2()
-    #dec2_1()
-    dec2_2()
+    dec3_2()
 
