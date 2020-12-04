@@ -100,7 +100,6 @@ def calculate_slope(hill, slope, skip):
         current_spot = current_spot % len(line)
     return hits
 
-
 def dec3_2():
     # format 6-11 c: dccxcccccchrcfdckcsc
     hill = []
@@ -117,6 +116,86 @@ def dec3_2():
     print (total)
 
 
+def is_valid_passport_1(passport):
+    if 'byr' not in passport \
+            or 'iyr' not in passport \
+            or 'eyr' not in passport \
+            or 'hgt' not in passport \
+            or 'hcl' not in passport \
+            or 'ecl' not in passport \
+            or 'pid' not in passport:
+        return 0
+    return 1
+
+
+def is_valid_passport_2(passport):
+    if 'byr' not in passport \
+            or 'iyr' not in passport \
+            or 'eyr' not in passport \
+            or 'hgt' not in passport \
+            or 'hcl' not in passport \
+            or 'ecl' not in passport \
+            or 'pid' not in passport:
+        return 0
+    if int(passport['byr']) < 1920 or int(passport['byr']) > 2002:
+        return 0
+    if int(passport['iyr']) < 2010 or int(passport['iyr']) > 2020:
+        return 0
+    if int(passport['eyr']) < 2020 or int(passport['eyr']) > 2030:
+        return 0
+    height = passport['hgt']
+    result = re.match('(\d+)(.*)', height)
+    if result.group(2) == 'cm':
+        if int(result.group(1)) < 150 or int(result.group(1)) > 193:
+            return 0
+    elif result.group(2) == 'in':
+        if int(result.group(1)) < 59 or int(result.group(1)) > 76:
+            return 0
+    else:
+        return 0
+
+    hair_color = passport['hcl']
+    result = re.match('^#[0-9a-f]{6}$', hair_color)
+    if not result:
+        return 0
+
+    eye_color = passport['ecl']
+    if eye_color not in ('amb', 'blu', 'brn', 'gry', 'grn', 'hzl', 'oth'):
+        return 0
+
+    if len(passport['pid']) != 9:
+        return 0
+    return 1
+
+
+def dec4_1():
+    data = []
+    valid = 0
+    with open('dec4.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            line = line.strip()
+            data.append(line)
+
+    passports = []
+    passport = {}
+    for line in data:
+        if line == "":
+            passports.append(passport)
+            passport = {}
+            continue
+        data = line.split()
+        for value in data:
+            pair = value.split(":")
+            passport[pair[0]] = pair[1]
+    passports.append(passport)
+
+    for passport in passports:
+        valid += is_valid_passport_2(passport)
+        print (valid)
+
+
+
+
 if __name__ == '__main__':
-    dec3_2()
+    dec4_1()
 
