@@ -1,6 +1,7 @@
 # coding=utf-8
 import re
 import sys
+import unittest
 
 
 def dec1_1():
@@ -95,10 +96,11 @@ def calculate_slope(hill, slope, skip):
             continue
         if line[current_spot] == '#':
             hits += 1
-        #print (line[:current_spot], line[current_spot], line[current_spot+1:], current_spot, hits)
+        # print (line[:current_spot], line[current_spot], line[current_spot+1:], current_spot, hits)
         current_spot += slope
         current_spot = current_spot % len(line)
     return hits
+
 
 def dec3_2():
     # format 6-11 c: dccxcccccchrcfdckcsc
@@ -194,8 +196,65 @@ def dec4_1():
         print (valid)
 
 
+def get_id(b_pass):
+    val = 1
+    my_id = 0
+    for c in reversed(b_pass):
+        if c in ('R', 'B'):
+            my_id += val
+        val *= 2
+    return my_id
+
+
+def dec5_1():
+    # FBFBBFFRLR - B = 1 and R = 1 convert to binary number
+    data = []
+    highest_id = 0
+
+    with open('dec5.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            line = line.strip()
+            data.append(line)
+
+    for b_pass in data:
+        my_id = get_id(b_pass)
+        if my_id > highest_id:
+            highest_id = my_id
+
+    print (highest_id)
+
+
+def dec5_2():
+    # FBFBBFFRLR - B = 1 and R = 1 convert to binary number
+    data = []
+    ids = [0]*900
+    lowest_id = 10000
+    with open('dec5.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            line = line.strip()
+            data.append(line)
+
+    for b_pass in data:
+        my_id = get_id(b_pass)
+        ids[my_id] = 1
+        if my_id < lowest_id:
+            lowest_id = my_id
+
+    print (ids)
+    for value, my_id in enumerate(ids):
+        if my_id == 0 and value > lowest_id:
+            print value
+            return
+
+
+class TestAll(unittest.TestCase):
+    def test_dec5_ids(self):
+        self.assertEqual(get_id('FBFBBFFRLR'), 357)
+        self.assertEqual(get_id('BFFFBBFRRR'), 567)
+        self.assertEqual(get_id('FFFBBBFRRR'), 119)
+        self.assertEqual(get_id('BBFFBBFRLL'), 820)
 
 
 if __name__ == '__main__':
-    dec4_1()
-
+    # unittest.main()
+    dec5_2()
