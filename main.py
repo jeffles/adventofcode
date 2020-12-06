@@ -247,6 +247,40 @@ def dec5_2():
             return
 
 
+def process_group(group):
+    print(group)
+    print (len(group))
+    return len(group)
+
+
+def dec6_1():
+    data = []
+    total = 0
+    with open('dec6.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            line = line.strip()
+            data.append(line)
+
+    group = {}
+    new_group = True
+    for line in data:
+        if line == "":
+            total += process_group(group)
+            group = {}
+            new_group = True
+            continue
+        if new_group:
+            new_group = False
+            for value in line:
+                group[value] = 1
+        else:
+            for key, value in group.items():
+                if key not in line:
+                    del group[key]
+    total += process_group(group)
+    print total
+
+
 class TestAll(unittest.TestCase):
     def test_dec5_ids(self):
         self.assertEqual(get_id('FBFBBFFRLR'), 357)
@@ -257,4 +291,4 @@ class TestAll(unittest.TestCase):
 
 if __name__ == '__main__':
     # unittest.main()
-    dec5_2()
+    dec6_1()
