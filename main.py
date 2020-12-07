@@ -281,6 +281,90 @@ def dec6_1():
     print total
 
 
+def dec7_1():
+    data = {}
+    total = 0
+    regex_non = r"(.*) bags contain no other bags"
+    regex = r"(.*?) bags contain(.*)."
+    bag_regex = r"\d+ (.*) bags?"
+    with open('dec7_test.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            bag = line.strip()
+
+            if re.search(regex_non, bag):
+                data[match.group(1)] = {}
+                print ("No match", bag)
+                continue
+
+            match = re.search(regex, bag)
+            # print(match.group(0))
+            outside = match.group(1)
+            bags = match.group(2).split(', ')
+
+            for bag in bags:
+                match = re.search(bag_regex, bag)
+                if match.group(1) in data:
+                    data[match.group(1)].append(outside)
+                else:
+                    data[match.group(1)] = [outside]
+
+    print ('data', data)
+    exists_in = []
+    bags = ['shiny gold']
+    while bags:
+        bag = bags.pop()
+        if bag in exists_in:
+            continue
+        print ('now', bag)
+        exists_in.append(bag)
+        if bag in data:
+            bags.extend(data[bag])
+    print (exists_in)
+    print len(exists_in) - 1
+
+
+def solve(color, data):
+    root = data[color]
+
+    if root is None:
+        return 0
+    else:
+        print ('X', root)
+        return sum([root[key]*solve(key, data) + root[key] for key in root])
+
+
+def dec7_2():
+    data = {}
+    total = 0
+    regex_non = r"(.*) bags contain no other bags."
+    regex = r"(.*?) bags contain(.*)."
+    bag_regex = r"(\d+) (.*) bags?"
+    with open('dec7.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            bag = line.strip()
+
+            match = re.search(regex_non, bag)
+            if match:
+                data[match.group(1)] = None
+                continue
+
+            match = re.search(regex, bag)
+            outside = match.group(1)
+            bags = match.group(2).split(', ')
+
+            for bag in bags:
+
+                match = re.search(bag_regex, bag)
+                bag_data = {match.group(2): int(match.group(1))}
+                if outside in data:
+                    data[outside][match.group(2)] = int(match.group(1))
+                else:
+                    data[outside] = bag_data
+
+    print (data)
+    print (solve('shiny gold', data))
+
+
 class TestAll(unittest.TestCase):
     def test_dec5_ids(self):
         self.assertEqual(get_id('FBFBBFFRLR'), 357)
@@ -291,4 +375,4 @@ class TestAll(unittest.TestCase):
 
 if __name__ == '__main__':
     # unittest.main()
-    dec6_1()
+    dec7_2()
