@@ -365,6 +365,81 @@ def dec7_2():
     print (solve('shiny gold', data))
 
 
+def dec8_1():
+    data = []
+    acc = 0
+    index = 0
+    with open('dec8.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            data.append(line.strip())
+
+    while data[index]:
+        line = data[index]
+        if not line:
+            break
+        operation = line[0:3]
+        print(operation, line)
+        if operation == 'nop':
+            data[index] = None
+            index += 1
+        elif operation == 'jmp':
+            data[index] = None
+            index += int(line[4:])
+        elif operation == 'acc':
+            data[index] = None
+            acc += int(line[4:])
+            index += 1
+        else:
+            print ('ERROR')
+
+    print (acc)
+
+
+def dec8_2():
+    data = []
+    with open('dec8.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            data.append(line.strip())
+
+    stored_data = data[:]
+    swap_line = 0
+    while swap_line < len(data):
+        acc = 0
+        index = 0
+        data = stored_data[:]
+        while data[index]:
+            line = data[index]
+            if not line:
+                break
+            operation = line[0:3]
+            if swap_line == index:
+                if operation == 'nop':
+                    operation = 'jmp'
+                elif operation == 'jmp':
+                    operation = 'nop'
+                else:
+                    break
+            if operation == 'nop':
+                data[index] = None
+                index += 1
+            elif operation == 'jmp':
+                data[index] = None
+                index += int(line[4:])
+            elif operation == 'acc':
+                data[index] = None
+                acc += int(line[4:])
+                index += 1
+            else:
+                print ('ERROR')
+            if index == len(data):
+                print ('Success!!!', acc)
+                return
+            if index > len(data):
+                break
+        swap_line += 1
+    print (acc)
+
+
 class TestAll(unittest.TestCase):
     def test_dec5_ids(self):
         self.assertEqual(get_id('FBFBBFFRLR'), 357)
@@ -375,4 +450,4 @@ class TestAll(unittest.TestCase):
 
 if __name__ == '__main__':
     # unittest.main()
-    dec7_2()
+    dec8_2()
