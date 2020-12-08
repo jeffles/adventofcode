@@ -11,7 +11,7 @@ def dec1_1():
             line = line.strip()
             dict_2020[str(line)] = 1
             if str(2020 - int(line)) in dict_2020:
-                print int(line) * (2020 - int(line))
+                print (int(line) * (2020 - int(line)))
                 return
             # print ('Data {cnt} - {line} end', cnt, line)
 
@@ -243,7 +243,7 @@ def dec5_2():
     print (ids)
     for value, my_id in enumerate(ids):
         if my_id == 0 and value > lowest_id:
-            print value
+            print (value)
             return
 
 
@@ -278,7 +278,7 @@ def dec6_1():
                 if key not in line:
                     del group[key]
     total += process_group(group)
-    print total
+    print (total)
 
 
 def dec7_1():
@@ -320,7 +320,7 @@ def dec7_1():
         if bag in data:
             bags.extend(data[bag])
     print (exists_in)
-    print len(exists_in) - 1
+    print (len(exists_in) - 1)
 
 
 def solve(color, data):
