@@ -11,7 +11,7 @@ def dec1_1():
             line = line.strip()
             dict_2020[str(line)] = 1
             if str(2020 - int(line)) in dict_2020:
-                print (int(line) * (2020 - int(line)))
+                print(int(line) * (2020 - int(line)))
                 return
             # print ('Data {cnt} - {line} end', cnt, line)
 
@@ -26,7 +26,7 @@ def dec1_2():
 
                 for z in data:
                     if (x+y+z) == 2020:
-                        print (x*y*z)
+                        print(x*y*z)
                         return
 
 
@@ -45,7 +45,7 @@ def dec2_1():
             total = my_str.count(c)
             if my_min <= total <= my_max:
                 valid += 1
-    print (valid)
+    print(valid)
 
 
 def dec2_2():
@@ -67,7 +67,7 @@ def dec2_2():
 
             if matches == 1:
                 valid += 1
-    print (valid)
+    print(valid)
 
 
 def dec3_1():
@@ -83,7 +83,7 @@ def dec3_1():
     for line in hill:
         if line[current_spot] == '#':
             hits += 1
-        print (line[:current_spot], line[current_spot], line[current_spot+1:], current_spot, hits)
+        print(line[:current_spot], line[current_spot], line[current_spot+1:], current_spot, hits)
         current_spot += slope
         current_spot = current_spot % len(line)
 
@@ -115,7 +115,7 @@ def dec3_2():
     total *= calculate_slope(hill, 7, False)
     total *= calculate_slope(hill, 1, True)
 
-    print (total)
+    print(total)
 
 
 def is_valid_passport_1(passport):
@@ -193,7 +193,7 @@ def dec4_1():
 
     for passport in passports:
         valid += is_valid_passport_2(passport)
-        print (valid)
+        print(valid)
 
 
 def get_id(b_pass):
@@ -221,7 +221,7 @@ def dec5_1():
         if my_id > highest_id:
             highest_id = my_id
 
-    print (highest_id)
+    print(highest_id)
 
 
 def dec5_2():
@@ -240,16 +240,16 @@ def dec5_2():
         if my_id < lowest_id:
             lowest_id = my_id
 
-    print (ids)
+    print(ids)
     for value, my_id in enumerate(ids):
         if my_id == 0 and value > lowest_id:
-            print (value)
+            print(value)
             return
 
 
 def process_group(group):
     print(group)
-    print (len(group))
+    print(len(group))
     return len(group)
 
 
@@ -278,12 +278,11 @@ def dec6_1():
                 if key not in line:
                     del group[key]
     total += process_group(group)
-    print (total)
+    print(total)
 
 
 def dec7_1():
     data = {}
-    total = 0
     regex_non = r"(.*) bags contain no other bags"
     regex = r"(.*?) bags contain(.*)."
     bag_regex = r"\d+ (.*) bags?"
@@ -293,7 +292,7 @@ def dec7_1():
 
             if re.search(regex_non, bag):
                 data[match.group(1)] = {}
-                print ("No match", bag)
+                print("No match", bag)
                 continue
 
             match = re.search(regex, bag)
@@ -308,19 +307,19 @@ def dec7_1():
                 else:
                     data[match.group(1)] = [outside]
 
-    print ('data', data)
+    print('data', data)
     exists_in = []
     bags = ['shiny gold']
     while bags:
         bag = bags.pop()
         if bag in exists_in:
             continue
-        print ('now', bag)
+        print('now', bag)
         exists_in.append(bag)
         if bag in data:
             bags.extend(data[bag])
-    print (exists_in)
-    print (len(exists_in) - 1)
+    print(exists_in)
+    print(len(exists_in) - 1)
 
 
 def solve(color, data):
@@ -329,13 +328,12 @@ def solve(color, data):
     if root is None:
         return 0
     else:
-        print ('X', root)
+        print('X', root)
         return sum([root[key]*solve(key, data) + root[key] for key in root])
 
 
 def dec7_2():
     data = {}
-    total = 0
     regex_non = r"(.*) bags contain no other bags."
     regex = r"(.*?) bags contain(.*)."
     bag_regex = r"(\d+) (.*) bags?"
@@ -361,8 +359,8 @@ def dec7_2():
                 else:
                     data[outside] = bag_data
 
-    print (data)
-    print (solve('shiny gold', data))
+    print(data)
+    print(solve('shiny gold', data))
 
 
 def dec8_1():
@@ -390,9 +388,23 @@ def dec8_1():
             acc += int(line[4:])
             index += 1
         else:
-            print ('ERROR')
+            print('ERROR')
 
-    print (acc)
+    print(acc)
+
+
+def run (line, index, acc):
+    operation = line[:3]
+    if operation == 'nop':
+        index += 1
+    elif operation == 'jmp':
+        index += int(line[4:])
+    elif operation == 'acc':
+        acc += int(line[4:])
+        index += 1
+    else:
+        print('ERROR')
+    return index, acc
 
 
 def dec8_2():
@@ -407,37 +419,26 @@ def dec8_2():
         acc = 0
         index = 0
         data = stored_data[:]
+        if data[swap_line][:3] == 'nop':
+            data[swap_line] = 'jmp' + data[swap_line][4:]
+        elif data[swap_line][:3] == 'jmp':
+            data[swap_line] = 'nop' + data[swap_line][4:]
+        else:
+            swap_line += 1
+            continue
+        swap_line += 1
         while data[index]:
             line = data[index]
-            if not line:
-                break
-            operation = line[0:3]
-            if swap_line == index:
-                if operation == 'nop':
-                    operation = 'jmp'
-                elif operation == 'jmp':
-                    operation = 'nop'
-                else:
-                    break
-            if operation == 'nop':
-                data[index] = None
-                index += 1
-            elif operation == 'jmp':
-                data[index] = None
-                index += int(line[4:])
-            elif operation == 'acc':
-                data[index] = None
-                acc += int(line[4:])
-                index += 1
-            else:
-                print ('ERROR')
+            data[index] = None
+            (index, acc) = run(line, index, acc)
+
             if index == len(data):
-                print ('Success!!!', acc)
+                print('Success!!!', acc)
                 return
             if index > len(data):
                 break
-        swap_line += 1
-    print (acc)
+
+    print(acc)
 
 
 class TestAll(unittest.TestCase):
