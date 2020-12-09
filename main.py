@@ -393,7 +393,7 @@ def dec8_1():
     print(acc)
 
 
-def run (line, index, acc):
+def run(line, index, acc):
     operation = line[:3]
     if operation == 'nop':
         index += 1
@@ -441,6 +441,66 @@ def dec8_2():
     print(acc)
 
 
+def dec9_1_and_2():
+    data = []
+    with open('dec9.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            data.append(int(line.strip()))
+
+    print(data)
+    index = 0
+    last_25 = {}
+    fail = 0
+    while len(last_25) < 25:
+        element = data[index]
+        if element not in last_25:
+            last_25[element] = 1
+        else:
+            last_25[element] += 1
+        index += 1
+
+    while index < len(data):
+        element = data[index]
+        works = False
+        for item in last_25:
+            if element - item in last_25:
+                works = True
+                break
+        if not works:
+            fail = element
+            print(f"item {element} is the answer to part 1")
+            break
+        element = data[index]
+        last_25[element] = last_25.get(element, 0) + 1
+
+        element = data[index - 25]
+        if last_25[element] > 1:
+            last_25[element] -= 1
+        else:
+            del last_25[element]
+
+        index += 1
+
+    # Part 2
+    for i in range(len(data)):
+        total = data[i]
+        smallest = data[i]
+        largest = data[i]
+        start = data[i]
+        while total < fail:
+            i += 1
+            total += data[i]
+            if data[i] < smallest:
+                smallest = data[i]
+            if data[i] > largest:
+                largest = data[i]
+
+        if total == fail and data[i] != start:
+            print(f"start is {start} end is {data[i]}")
+            print(f"{smallest+largest} is the answer to part 2")
+            return
+
+
 class TestAll(unittest.TestCase):
     def test_dec5_ids(self):
         self.assertEqual(get_id('FBFBBFFRLR'), 357)
@@ -451,4 +511,4 @@ class TestAll(unittest.TestCase):
 
 if __name__ == '__main__':
     # unittest.main()
-    dec8_2()
+    dec9_1_and_2()
