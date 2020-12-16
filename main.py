@@ -5,54 +5,52 @@ import unittest
 
 
 def dec1_1():
-    dict_2020 = {}
-    with open('dec1_1.txt', 'r') as f:
+    data = []
+    floor = 0
+    index = 1
+    with open('dec1-1.txt', 'r') as f:
         for cnt, line in enumerate(f):
-            line = line.strip()
-            dict_2020[str(line)] = 1
-            if str(2020 - int(line)) in dict_2020:
-                print(int(line) * (2020 - int(line)))
-                return
-            # print ('Data {cnt} - {line} end', cnt, line)
-
-
-def dec1_2():
-    with open('dec1_1.txt', 'r') as f:
-        data = [int(value) for value in f.read().splitlines()]
-        for x in data:
-            for y in data:
-                if (x+y) >= 2020:
-                    continue
-
-                for z in data:
-                    if (x+y+z) == 2020:
-                        print(x*y*z)
-                        return
+            data.append(line.strip())
+    for char in data[0]:
+        if char == '(':
+            floor += 1
+        elif char == ')':
+            floor -= 1
+        else:
+            print('ERROR')
+        if floor < 0:
+            print('part 2', index)
+            return
+        index += 1
+    print('part 1', floor)
 
 
 def dec2_1():
-    # format 6-11 c: dccxcccccchrcfdckcsc
-    valid = 0
-    regex = r"(\d+).(\d+) (\w): (\w+)"
-    with open('dec2_1.txt', 'r') as f:
+    data = []
+    total = 0
+    with open('dec2-2.txt', 'r') as f:
         for cnt, line in enumerate(f):
-            match = re.search(regex, line)
-            print(match.group(0))
-            my_min = int(match.group(1))
-            my_max = int(match.group(2))
-            c = (match.group(3))
-            my_str = (match.group(4))
-            total = my_str.count(c)
-            if my_min <= total <= my_max:
-                valid += 1
-    print(valid)
+            data.append(line.strip())
+
+    for present in data:
+        l, w, h = present.split('x')
+        l = int(l)
+        w = int(w)
+        h = int(h)
+        print(l, w, h, present)
+        size = 2*l*w + 2*l*h + 2*w*h
+        size += min(l*w, l*h, w*h)
+        total += size
+    print(total)
+
+
 
 
 def dec2_2():
     # format 6-11 c: dccxcccccchrcfdckcsc
     valid = 0
     regex = r"(\d+).(\d+) (\w): (\w+)"
-    with open('dec2_1.txt', 'r') as f:
+    with open('dec19-2.txt', 'r') as f:
         for cnt, line in enumerate(f):
             match = re.search(regex, line)
             first = int(match.group(1))
@@ -558,14 +556,97 @@ def dec10_2():
     print(paths)
 
 
-class TestAll(unittest.TestCase):
-    def test_dec5_ids(self):
-        self.assertEqual(get_id('FBFBBFFRLR'), 357)
-        self.assertEqual(get_id('BFFFBBFRRR'), 567)
-        self.assertEqual(get_id('FFFBBBFRRR'), 119)
-        self.assertEqual(get_id('BBFFBBFRLL'), 820)
+def dec16_1():
+    data = []
+    total = 0
+    with open('dec16.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            data.append(line.strip())
+
+    valid_nums = [False]*1000
+    line = data.pop(0)
+    possibilities = []
+    regex = re.compile('(.*): (\d+)-(\d+) or (\d+)-(\d+)')
+    while line:  # rules
+        my_obj = {}
+        match = re.search(regex, line)
+        name = match.group(1)
+        start1 = int(match.group(2))
+        end1 = int(match.group(3))
+        start2 = int(match.group(4))
+        end2 = int(match.group(5))
+        my_obj['name'] = name
+        my_obj['s1'] = start1
+        my_obj['e1'] = end1
+        my_obj['s2'] = start2
+        my_obj['e2'] = end2
+        my_obj['rows'] = [True]*20
+        possibilities.append(my_obj)
+        for i in range(start1, end1):
+            valid_nums[i] = True
+        for i in range(start2, end2):
+            valid_nums[i] = True
+        print(f'{start1} {end1}    {start2} {end2}')
+        line = data.pop(0)
+    print(possibilities)
+
+
+    data.pop(0)
+    my_ticket = data.pop(0)
+    my_ticket = my_ticket.split(',')
+    for i in range(len(my_ticket)):
+        my_ticket[i] = int(my_ticket[i])
+    data.pop(0)
+    data.pop(0)
+
+    err_sum = 0
+
+    valid_tickets = [my_ticket]
+    for ticket in data:
+        invalid = False
+        vals = ticket.split(',')
+        for val in vals:
+            if valid_nums[int(val)]:
+                continue
+            err_sum += int(val)
+            invalid = True
+        for i in range(len(vals)):
+            vals[i] = int(vals[i])
+        if not invalid:
+            valid_tickets.append(vals)
+    print(err_sum, len(valid_tickets), valid_tickets)
+
+    print(valid_tickets[0][0], valid_tickets[1][1])
+    for pos in possibilities:
+        print(pos)
+        for i in range(len(pos['rows'])):
+            if not pos['rows'][i]:
+                continue
+            for ticket in valid_tickets:
+                if ticket[i] < pos['s1']:
+                    pos['rows'][i] = False
+                if ticket[i] > pos['e2']:
+                    pos['rows'][i] = False
+                if ticket[i] > pos['e1'] and ticket[i] < pos['s2']:
+                    pos['rows'][i] = False
+    print('RESULT')
+    print(possibilities)
+    for pos in possibilities:
+        print(pos)
+
+    print('Now solve manually, first one row has only one truth, then after one column will have one truth')
+    print(my_ticket[14] * my_ticket[12] * my_ticket[15] * my_ticket[3] * my_ticket[17] * my_ticket[4])
+
+
+
+# class TestAll(unittest.TestCase):
+#     def test_dec5_ids(self):
+#         self.assertEqual(get_id('FBFBBFFRLR'), 357)
+#         self.assertEqual(get_id('BFFFBBFRRR'), 567)
+#         self.assertEqual(get_id('FFFBBBFRRR'), 119)
+#         self.assertEqual(get_id('BBFFBBFRLL'), 820)
 
 
 if __name__ == '__main__':
     # unittest.main()
-    dec10_2()
+    dec16_1()
