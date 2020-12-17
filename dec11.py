@@ -3,6 +3,7 @@ import copy
 import re
 import sys
 import unittest
+import itertools
 
 
 def print_board(data):
@@ -99,6 +100,123 @@ def dec11_2():
     print(occupied)
 
 
+def dec17_1():
+    board = [[]]
+    empty_plane = []
+    new_board = []
+    occupied = 0
+    steps = 6
+
+    with open('dec17.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            board[0].append(list(line.strip()))
+
+    active = 0
+    for z in range(len(board)):
+        for x in range(len(board[0])):
+            for y in range(len(board[0][0])):
+                if board[z][x][y] == '#':
+                    active += 1
+    print('ACTIVE:', active)
+
+    for z in range(len(board)):
+        for x in range(len(board[z])):
+            board[z][x].append('.')
+            board[z][x].append('.')
+            for y in range(len(board[z][x]) - 1, -1, -1):
+                board[z][x][y] = copy.deepcopy(board[z][x][y - 1])
+            board[z][x][0] = '.'
+
+    size = len(board[0]) + 2
+    print(size)
+    for z in range(len(board) - 1, -1, -1):
+        board[z].append(['.'] * size)
+        board[z].append(['.'] * size)
+        for x in range(len(board[z]) - 1, -1, -1):
+            board[z][x] = copy.deepcopy(board[z][x - 1])
+
+    empty_plane = copy.deepcopy(board[0])
+    for x in range(len(empty_plane)):
+        for y in range(len(empty_plane)):
+            empty_plane[x][y] = '.'
+    board.append(copy.deepcopy(empty_plane))
+    board.append(copy.deepcopy(empty_plane))
+
+    for z in range(len(board) - 1, -1, -1):
+        board[z] = copy.deepcopy(board[z - 1])
+    # for z in board:
+    #     print('--- ')
+    #     for x in z:
+    #         print(x)
+
+    for step in range(steps):
+        print('SIZE:', len(board))
+
+        # Grow Board
+        for z in range(len(board)):
+            for x in range(len(board[z])):
+                board[z][x].append('.')
+                board[z][x].append('.')
+                for y in range(len(board[z][x])-1, -1, -1):
+                    board[z][x][y] = copy.deepcopy(board[z][x][y-1])
+                board[z][x][0] = '.'
+
+        size = len(board[0])+2
+        print(size)
+        for z in range(len(board)-1, -1, -1):
+            board[z].append(['.'] * size)
+            board[z].append(['.'] * size)
+            for x in range(len(board[z])-1, -1, -1):
+                board[z][x] = copy.deepcopy(board[z][x-1])
+
+        empty_plane = copy.deepcopy(board[0])
+        for x in range(len(empty_plane)):
+            for y in range(len(empty_plane)):
+                empty_plane[x][y] = '.'
+        board.append(copy.deepcopy(empty_plane))
+        board.append(copy.deepcopy(empty_plane))
+
+        for z in range(len(board)-1, -1, -1):
+            board[z] = copy.deepcopy(board[z-1])
+        for z in board:
+            print('--- ')
+            for x in z:
+                print(x)
+        # Conway board
+        itertools.permutations('')
+        new_board = copy.deepcopy(board)
+        size = len(board[0])
+        for z in range(1, len(board)-1):
+            for x in range(1, size-1):
+                for y in range(1, size-1):
+                    active = 0
+                    perms = itertools.product([-1, 0, 1], repeat=3)
+                    for d_x, d_y, d_z in perms:
+                        if d_x == d_y == d_z == 0:
+                            continue
+                        if board[z+d_z][x+d_x][y+d_y] == '#':
+                            active += 1
+                    if active > 0:
+                        pass
+                    if board[z][x][y] == '#' and active not in (2, 3):
+                        new_board[z][x][y] = '.'
+                    elif board[z][x][y] == '.' and active == 3:
+                        new_board[z][x][y] = '#'
+        board = copy.deepcopy(new_board)
+        for z in board:
+            print('--- ')
+            for x in z:
+                print(x)
+        active = 0
+        for z in range(1, len(board)-1):
+            for x in range(1, len(board[0]) - 1):
+                for y in range(1, len(board[0]) - 1):
+                    if board[z][x][y] == '#':
+                        active += 1
+        print('ACTIVE:', active)
+
+    return
+
 if __name__ == '__main__':
     # unittest.main()
-    dec11_2()
+    dec17_2()
