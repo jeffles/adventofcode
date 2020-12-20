@@ -40,6 +40,7 @@ class Tile:
         rstr = ""
         for g in self.grid:
             rstr += g + '\n'
+        rstr += self.id
         for k, n in self.neighbor.items():
             if n is None:
                 continue
@@ -80,7 +81,7 @@ class Tile:
         self.grid = list(zip(*self.grid[::-1]))
         for i in range(len(self.grid)):
             self.grid[i] = "".join(self.grid[i])
-        (self.neighbor[0], self.neighbor[1], self.neighbor[2], self.neighbor[3]) = \
+        (self.neighbor[2], self.neighbor[3], self.neighbor[0], self.neighbor[1]) = \
             (self.neighbor[1], self.neighbor[2], self.neighbor[3], self.neighbor[0])
 
             # self.neighbor[n] = (self.neighbor[n] + 1) % 4
@@ -200,10 +201,8 @@ def dec20_1():
     big_grid = []
 
     tile = ntiles['2801']
-
     tile.rotate(1, ntiles['1319'])
     tile.flip(0)
-    print(tile)
     is_row1 = True
     while tile:
         row_start = tile
@@ -214,10 +213,12 @@ def dec20_1():
             tile.rotate(3, ptile)
             if is_row1 and tile.get_neighbor(0) is not None:
                 tile.flip(0)
+
             if not is_row1 and tile.get_neighbor(3).get_neighbor(0).get_neighbor(1) != tile.get_neighbor(0):
                 tile.flip(0)
             big_grid_row.append(tile)
         is_row1 = False
+
         big_grid.append(big_grid_row)
         tile = row_start.get_neighbor(2)
         if tile:
@@ -250,48 +251,17 @@ def dec20_1():
         print(r)
     monsters = list(find_monsters(big_tile))
     print(monsters)
-
-    big_tile = list(zip(*big_tile[::-1]))
-    for i in range(len(big_tile)):
-        big_tile[i] = "".join(big_tile[i])
-
-    print('XXXXX')
-    print('XXXXX')
-    for r in big_tile:
-        print(r)
-    monsters = list(find_monsters(big_tile))
-    print(monsters)
-
-    big_tile = list(zip(*big_tile[::-1]))
-    for i in range(len(big_tile)):
-        big_tile[i] = "".join(big_tile[i])
-
-    print('XXXXX')
-    print('XXXXX')
-    for r in big_tile:
-        print(r)
-    monsters = list(find_monsters(big_tile))
-    print(monsters)
-
-    big_tile = list(zip(*big_tile[::-1]))
-    for i in range(len(big_tile)):
-        big_tile[i] = "".join(big_tile[i])
-
-    print('XXXXX')
-    print('XXXXX')
-    for r in big_tile:
-        print(r)
-    monsters = list(find_monsters(big_tile))
-    print(monsters)
+    print(len(monsters))
 
 
     pounds = 0
     for k, v in ntiles.items():
-        for l in v.get_grid():
+        for l in v.get_grid()[1:-1]:
             for c in l[1:-1]:
                 if c == '#':
                     pounds += 1
     print(pounds)
+    print(pounds - 15*len(monsters))
 
 class TestAll(unittest.TestCase):
     def test_rotate(self):
