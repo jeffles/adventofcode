@@ -630,6 +630,291 @@ def dec13_1():
     print(max_happiness)
 
 
+def dec14_1():
+    data = []
+    with open('dec2015-14.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            line = line.strip()
+            data.append(line)
+
+    deers = []
+    regex = re.compile('^(\w+) .*? (\d+) .*? (\d+) .*? (\d+)')
+    for line in data:
+        print(line)
+        match = regex.match(line)
+        print(match.group(1), match.group(2), match.group(3), match.group(4))
+        my_deer = {}
+        my_deer['name'] = match.group(1)
+        my_deer['speed'] = int(match.group(2))
+        my_deer['time'] = int(match.group(3))
+        my_deer['rest'] = int(match.group(4))
+        deers.append(my_deer)
+
+    print(deers)
+    deer_dist = []
+    for deer in deers:
+        elapsed = 2503
+        distance = 0
+        speed = deer['speed']
+        time = deer['time']
+        rest = deer['rest']
+        temp_time = time
+        temp_rest = rest
+        my_dist = []
+        while elapsed > 0:
+            elapsed -= 1
+            if temp_time == 0:
+                temp_rest -= 1
+                if temp_rest == 0:
+                    temp_time = time
+                    temp_rest = rest
+                my_dist.append(distance)
+            else:
+                distance += speed
+                my_dist.append(distance)
+                temp_time -= 1
+        print(my_dist)
+        deer_dist.append(my_dist)
+        print(f"{deer['name']} went {distance}")
+    my_points = [0]*9
+    for i in range(len(deer_dist[0])):
+        max_deer = None
+        max_dist = 0
+        for deer in range(len(deer_dist)):
+            if deer_dist[deer][i] > max_dist:
+                max_deer = deer
+                max_dist = deer_dist[deer][i]
+        my_points[max_deer] += 1
+    print(my_points)
+
+
+def get_score(ing, quantities):
+    cap_total = 0
+    dur_total = 0
+    fla_total = 0
+    tex_total = 0
+    cal_total = 0
+    for i, quan in enumerate(quantities):
+        cap_total += ing[i]['capacity'] * quan
+        dur_total += ing[i]['durability'] * quan
+        fla_total += ing[i]['flavor'] * quan
+        tex_total += ing[i]['texture'] * quan
+        cal_total += ing[i]['calories'] * quan
+    cap_total = max(cap_total, 0)
+    dur_total = max(dur_total, 0)
+    fla_total = max(fla_total, 0)
+    tex_total = max(tex_total, 0)
+
+    score = cap_total * dur_total * fla_total * tex_total
+    if cal_total != 500:
+        score = 0
+    return score
+
+def dec15_1():
+    ing = [{'name': 'Sprinkles', 'capacity': 5, 'durability': -1, 'flavor': 0, 'texture': 0, 'calories': 5},
+           {'name': 'PeanutButter', 'capacity': -1, 'durability': 3, 'flavor': 0, 'texture': 0, 'calories': 1},
+           {'name': 'Frosting', 'capacity': 0, 'durability': -1, 'flavor': 4, 'texture': 0, 'calories': 6},
+           {'name': 'Sugar', 'capacity': -1, 'durability': 0, 'flavor': 0, 'texture': 2, 'calories': 8}]
+
+    max_score = 0
+    for a in range(0, 101):
+        for b in range(0, 101-a):
+            for c in range(0, 101-a-b):
+                for d in range(0, 101-a-b-c):
+                    score = get_score(ing, [a, b, c, d])
+                    if score > max_score:
+                        max_score = score
+                        print(score, a, b, c, d)
+    quantities = [25, 25, 25, 25]
+    print(get_score(ing, quantities))
+    quantities = [24, 28, 24, 24]
+    print(get_score(ing, quantities))
+    quantities = [23, 31, 23, 23]
+    print(get_score(ing, quantities))
+    quantities = [0, 0, 50, 50]
+    print(get_score(ing, quantities))
+
+
+def dec16_1():
+    data = []
+    with open('dec2015-16.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            line = line.strip()
+            data.append(line)
+    sue = {'children': 3,
+           'cats': 7,
+           'samoyeds': 2,
+           'pomeranians': 3,
+           'akitas': 0,
+           'vizslas': 0,
+           'goldfish': 5,
+           'trees': 3,
+           'cars': 2,
+           'perfumes': 1}
+    aunts = []
+    regex = re.compile('^Sue (\d+): (\w+): (\d+), (\w+): (\d+), (\w+): (\d+)')
+    for line in data:
+        print(line)
+        match = regex.match(line)
+        print(match.group(1), match.group(2), match.group(3), match.group(4), match.group(5), match.group(6), match.group(7))
+        my_aunt = {}
+        my_aunt['id'] = match.group(1)
+        my_aunt[match.group(2)] = int(match.group(3))
+        my_aunt[match.group(4)] = int(match.group(5))
+        my_aunt[match.group(6)] = int(match.group(7))
+        aunts.append(my_aunt)
+
+    for aunt in aunts:
+        her = True
+        for key, val in sue.items():
+            if key in ('cats', 'trees'):
+                if key in aunt:
+                    if val >= aunt[key]:
+                        her = False
+            elif key in ('pomeranians', 'goldfish'):
+                if key in aunt:
+                    if val <= aunt[key]:
+                        her = False
+            elif val != aunt.get(key, val):
+                her = False
+        if her:
+            print('FOund HER', aunt['id'])
+
+
+def solve(containers, remaining, number):
+    minimum = 1000
+    if number > 4:
+        return 0, 1000
+    if remaining == 0:
+        return 1, number
+    if not containers:
+        return 0, 1000
+    total = 0
+    solves, my_num = solve(containers[1:], remaining - containers[0], number + 1)
+    total += solves
+    if my_num < minimum:
+        minimum = my_num
+    solves, my_num = solve(containers[1:], remaining, number)
+    if my_num < minimum:
+        minimum = my_num
+    total += solves
+    # print(containers, remaining)
+    return total, minimum
+
+
+def dec17_1():
+    containers = [50, 44, 11, 49, 42, 46, 18, 32, 26, 40, 21, 7, 18, 43, 10, 47, 36, 24, 22, 40]
+    # containers = [20, 15, 10, 5, 5]
+    volume = 150
+    num_solutions, minimum = solve(containers, volume, 0)
+    print('Solutions', num_solutions, minimum)
+
+
+def dec19_1():
+    data = []
+    combinations = {}
+    with open('input.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            line = line.strip()
+            data.append(line)
+    regex = re.compile('(.*) => (.*)')
+    replace = {}
+    replace2 = {}
+    for d in data:
+        match = regex.match(d)
+        #print(match.group(1), match.group(2))
+        answer = match.group(2)
+        cell = answer[0]
+        answers = []
+        for a in answer[1:]:
+            if re.match('[A-Z]', a):
+                answers.append(cell)
+                cell = a
+            else:
+                cell += a
+        answers.append(cell)
+
+        if match.group(1) in replace:
+            replace[match.group(1)].append(match.group(2))
+            replace2[match.group(1)].append(answers)
+        else:
+            replace[match.group(1)] = [match.group(2)]
+            replace2[match.group(1)] = [answers]
+
+    print(replace)
+    print(replace2)
+
+    start = 'HOH'
+    start = 'HOHOHO'
+    start = 'CRnCaSiRnBSiRnFArTiBPTiTiBFArPBCaSiThSiRnTiBPBPMgArCaSiRnTiMgArCaSiThCaSiRnFArRnSiRnFArTiTiBFArCaCaSiRnSiThCaCaSiRnMgArFYSiRnFYCaFArSiThCaSiThPBPTiMgArCaPRnSiAlArPBCaCaSiRnFYSiThCaRnFArArCaCaSiRnPBSiRnFArMgYCaCaCaCaSiThCaCaSiAlArCaCaSiRnPBSiAlArBCaCaCaCaSiThCaPBSiThPBPBCaSiRnFYFArSiThCaSiRnFArBCaCaSiRnFYFArSiThCaPBSiThCaSiRnPMgArRnFArPTiBCaPRnFArCaCaCaCaSiRnCaCaSiRnFYFArFArBCaSiThFArThSiThSiRnTiRnPMgArFArCaSiThCaPBCaSiRnBFArCaCaPRnCaCaPMgArSiRnFYFArCaSiThRnPBPMgAr'
+    for i in range(len(start)):
+        end = i + 1
+        if start[i:end] not in replace:
+            end += 1
+        if start[i:end] not in replace:
+           continue
+        molecule = start[i:end]
+
+        for match in replace[molecule]:
+            match_str = start[:i] + match + start[end:]
+            combinations[match_str] = 1
+    print('Part 1', len(combinations))
+
+
+    goal = []
+    cell = start[0]
+    for a in start[1:]:
+        if re.match('[A-Z]', a):
+            goal.append(cell)
+            cell = a
+        else:
+            cell += a
+    goal.append(cell)
+    print(goal)
+
+    replace3 = []
+    for key, r in replace2.items():
+        # print(f'{key} =>')
+        for i in r:
+            out = ''
+            for val in i:
+                if val == 'Rn':
+                    val = '('
+                elif val == 'Y':
+                    val = ','
+                elif val == 'Ar':
+                    val = ')'
+                out += f'{val} '
+                # print(f'{val} ', end='')
+            out += f' => {key}'
+            # print(f' => {key}')
+            replace3.append(out)
+            # print(f'   {i}')
+    replace3.sort()
+
+    for val in replace3:
+        print(val)
+
+    commas = 0
+    total = 0
+    parens = 0
+    for val in goal:
+        total += 1
+        if val == 'Rn':
+            val = '('
+            parens += 1
+        elif val == 'Y':
+            val = ','
+            commas += 1
+        elif val == 'Ar':
+            val = ')'
+            parens += 1
+        print(val, end=' ')
+    print()
+    print("Part 2=", total - parens - 2 * commas - 1)
+
+# 196 is too high
+
 
 # class TestAll(unittest.TestCase):
 #     def test_dec5_ids(self):
@@ -637,8 +922,8 @@ def dec13_1():
 #         self.assertEqual(get_id('BFFFBBFRRR'), 567)
 #         self.assertEqual(get_id('FFFBBBFRRR'), 119)
 #         self.assertEqual(get_id('BBFFBBFRLL'), 820)
-
+9
 
 if __name__ == '__main__':
     # unittest.main()
-    dec13_1()
+    dec19_1()
