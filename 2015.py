@@ -913,7 +913,49 @@ def dec19_1():
     print()
     print("Part 2=", total - parens - 2 * commas - 1)
 
-# 196 is too high
+from functools import reduce
+
+def factors(n):
+    return set(reduce(list.__add__,
+                ([i, n//i] for i in range(1, int(n**0.5) + 1) if n % i == 0)))
+
+def factor_sum(number):
+    fsum = 0
+    for f in factors(number):
+        if number/f <= 50:
+        # print(f)
+            fsum += f
+    # fsum = 0
+    # for i in range(1, number + 1):
+    #     if number % i == 0:
+    #         fsum += i
+    return fsum
+
+def dec20():
+    data = []
+    input = 34000000
+    sum = 0
+    number = 1
+    while sum < input:
+        sum += number * 10
+        number += 1
+
+    print('Minimum to consider', number, sum)
+    number = 694000
+    number = 0
+    max_found = 0
+    while number < input / 11:
+        number += 1
+        fsum = factor_sum(number) * 11
+        if number % 100 == 0:
+            print(number, fsum, max_found)
+        if fsum > max_found:
+            max_found = fsum
+        if fsum > input:
+            print('ANSWER', number)
+            break
+
+
 
 
 # class TestAll(unittest.TestCase):
@@ -922,8 +964,7 @@ def dec19_1():
 #         self.assertEqual(get_id('BFFFBBFRRR'), 567)
 #         self.assertEqual(get_id('FFFBBBFRRR'), 119)
 #         self.assertEqual(get_id('BBFFBBFRLL'), 820)
-9
 
 if __name__ == '__main__':
     # unittest.main()
-    dec19_1()
+    dec20()
