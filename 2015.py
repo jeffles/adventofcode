@@ -1,10 +1,13 @@
 # coding=utf-8
+import copy
 import hashlib
 import json
 import re
 import sys
 import unittest
 import itertools
+
+from operator import attrgetter
 
 
 def dec1_1():
@@ -1039,6 +1042,63 @@ def dec21():
                         print(f'Loser {w["name"]} {a["name"]} {r["name"]} {r2["name"]}, {price}')
 
 
+def dec23():
+    data = []
+    with open('input.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            data.append(line.strip())
+    a = 1
+    b = 0
+    i = 0
+    while i < len(data):
+        line = data[i]
+        print(line, a, b)
+        i += 1
+        if line[0:3] == 'inc':
+            if line[4] == 'a':
+                a += 1
+            elif line[4] == 'b':
+                b += 1
+            else:
+                print('Error')
+        if line[0:3] == 'tpl':
+            if line[4] == 'a':
+                a *= 3
+            elif line[4] == 'b':
+                b *= 3
+            else:
+                print('Error')
+
+        if line[0:3] == 'hlf':
+            if line[4] == 'a':
+                a /= 2
+                a = int(a)
+            elif line[4] == 'b':
+                b /= 2
+                b = int(b)
+            else:
+                print('Error')
+        if line[0:3] == 'jmp':
+            amt = int(line[4:])
+            # print(amt)
+            i += amt - 1
+        if line[0:3] == 'jio':
+            amt = int(line[7:])
+            # print(amt)
+            if line[4] == 'a' and a == 1:
+                i += amt - 1
+            elif line[4] == 'b' and b == 1:
+                i += amt - 1
+        if line[0:3] == 'jie':
+            amt = int(line[7:])
+            # print(amt)
+            if line[4] == 'a' and a % 2 == 0:
+                i += amt - 1
+            elif line[4] == 'b' and b % 2 == 0:
+                i += amt - 1
+
+    print(a, b)
+
 
 # class TestAll(unittest.TestCase):
 #     def test_dec5_ids(self):
@@ -1049,4 +1109,4 @@ def dec21():
 
 if __name__ == '__main__':
     # unittest.main()
-    dec21()
+    dec23()
