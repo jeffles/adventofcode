@@ -1176,13 +1176,21 @@ def dec24():
     print(data)
     # answer = match(target, (), tuple(data))
 
-# class TestAll(unittest.TestCase):
-#     def test_dec5_ids(self):
-#         self.assertEqual(get_id('FBFBBFFRLR'), 357)
-#         self.assertEqual(get_id('BFFFBBFRRR'), 567)
-#         self.assertEqual(get_id('FFFBBBFRRR'), 119)
-#         self.assertEqual(get_id('BBFFBBFRLL'), 820)
+
+def dec25():
+    row = 2947
+    column = 3029
+    cell = 0
+    for i in range(row-1):
+        cell += i + 1
+    for j in range(column-1):
+        cell += row + j + 1
+    print(cell)
+
+    code = 20151125
+    for i in range(cell):
+        code = (code * 252533) % 33554393
+    print(i, code)
 
 if __name__ == '__main__':
-    # unittest.main()
-    dec24()
+    dec25()
