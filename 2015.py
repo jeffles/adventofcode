@@ -955,6 +955,88 @@ def dec20():
             print('ANSWER', number)
             break
 
+def is_winner(boss, damage, armor):
+    boss_life = boss['hp']
+    boss_armor = boss['armor']
+    boss_damage = boss['damage']
+    if damage < boss_armor:
+        damage = boss_armor + 1
+    if boss_damage < armor:
+        boss_damage = armor + 1
+    myHp = 100
+    my_turn = True
+    while myHp > 0 and boss_life > 0:
+        if my_turn:
+            my_turn = False
+            boss_life -= damage - boss_armor
+        else:
+            my_turn = True
+            myHp -= boss_damage - armor
+    if boss_life <= 0:
+        return True
+    return False
+
+def dec21():
+
+    weapons = [{'name': 'Dagger', 'price': 8, 'damage': 4, 'armor': 0},
+               {'name': 'Shortsword', 'price': 10, 'damage': 5, 'armor': 0},
+               {'name': 'Warhammer', 'price': 25, 'damage': 6, 'armor': 0},
+               {'name': 'Longsword', 'price': 40, 'damage': 7, 'armor': 0},
+               {'name': 'Greataxe', 'price': 74, 'damage': 8, 'armor': 0}]
+    print(weapons)
+
+    armors = [{'name': 'None', 'price': 0, 'damage': 0, 'armor': 0},
+             {'name': 'Leather', 'price': 13, 'damage': 0, 'armor': 1},
+             {'name': 'Chainmail', 'price': 31, 'damage': 0, 'armor': 2},
+             {'name': 'Splintmail', 'price': 53, 'damage': 0, 'armor': 3},
+             {'name': 'Bandedmail', 'price': 75, 'damage': 0, 'armor': 4},
+             {'name': 'Platemail', 'price': 102, 'damage': 0, 'armor': 5}]
+    print(armors)
+
+    rings = [{'name': 'None', 'price': 0, 'damage': 0, 'armor': 0},
+             {'name': 'None2', 'price': 0, 'damage': 0, 'armor': 0},
+             {'name': 'Damage + 1', 'price': 25, 'damage': 1, 'armor': 0},
+             {'name': 'Damage + 2', 'price': 50, 'damage': 2, 'armor': 0},
+             {'name': 'Damage + 3', 'price': 100, 'damage': 3, 'armor': 0},
+             {'name': 'Defense + 1', 'price': 20, 'damage': 0, 'armor': 1},
+             {'name': 'Defense + 2', 'price': 40, 'damage': 0, 'armor': 2},
+             {'name': 'Defense + 2', 'price': 80, 'damage': 0, 'armor': 3}]
+    print(rings)
+
+    boss = {'hp': 100, 'damage': 8, 'armor': 2}
+    print(boss)
+
+    min_price = 10000
+    for w in weapons:
+        for a in armors:
+            for r in rings:
+                for r2 in rings:
+                    if r['name'] == r2['name']:
+                        continue
+                    price = w['price'] + a['price'] + r['price'] + r2['price']
+                    damage = w['damage'] + a['damage'] + r['damage'] + r2['damage']
+                    armor = w['armor'] + a['armor'] + r['armor'] + r2['armor']
+                    if price > min_price:
+                        continue
+                    if is_winner(boss, damage, armor):
+                        min_price = price
+                        print(f'Winner {w["name"]} {a["name"]} {r["name"]} {r2["name"]}, {price}')
+
+    max_price = 0
+    for w in weapons:
+        for a in armors:
+            for r in rings:
+                for r2 in rings:
+                    if r['name'] == r2['name']:
+                        continue
+                    price = w['price'] + a['price'] + r['price'] + r2['price']
+                    damage = w['damage'] + a['damage'] + r['damage'] + r2['damage']
+                    armor = w['armor'] + a['armor'] + r['armor'] + r2['armor']
+                    if price < max_price:
+                        continue
+                    if not is_winner(boss, damage, armor):
+                        max_price = price
+                        print(f'Loser {w["name"]} {a["name"]} {r["name"]} {r2["name"]}, {price}')
 
 
 
@@ -967,4 +1049,4 @@ def dec20():
 
 if __name__ == '__main__':
     # unittest.main()
-    dec20()
+    dec21()
