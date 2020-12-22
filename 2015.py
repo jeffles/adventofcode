@@ -1,14 +1,10 @@
 # coding=utf-8
-import copy
 import hashlib
+import itertools
 import json
 import re
-import sys
-import unittest
-import itertools
 
-from operator import attrgetter
-
+from functools import reduce
 
 def dec1_1():
     data = []
@@ -112,13 +108,7 @@ def dec3_1():
 
 
 def dec4_1():
-    data = []
-    valid = 0
     input = 'ckczppom'
-    #input = 'abcdef'
-
-    # encoding GeeksforGeeks using md5 hash
-    # function
 
     result = hashlib.md5(b'GeeksforGeeks')
     result = hashlib.md5('abcdef609043'.encode())
@@ -134,8 +124,6 @@ def dec4_1():
             return
         # print(result.hexdigest(), index)
         index += 1
-
-
 
 
 def get_id(b_pass):
@@ -169,7 +157,7 @@ def dec5_2():
             good = False
         repeat = False
         for i in range(len(word)-2):
-            if word[i]== word[i+2]:
+            if word[i] == word[i+2]:
                 repeat = True
                 break
         if not repeat:
@@ -294,7 +282,7 @@ def dec7_1():
         opp = match.group(4)
         right = match.group(5)
         to = match.group(6)
-        #print(f'Left:{left} Opp:{opp} Right:{right} To:{to}')
+        # print(f'Left:{left} Opp:{opp} Right:{right} To:{to}')
         if opp is None:
             try:
                 wires[to] = int(right)
@@ -369,12 +357,8 @@ def dec8_1():
         line = re.sub('\\\\\\\\', 'x', line)
         print('after', line)
 
-
         subtotal += len(line)
 
-
-
-        # Count // in line
     print(total, subtotal, total-subtotal)
 
 
@@ -403,8 +387,6 @@ def dec8_2():
 
 
 def dec9_1():
-    total = 0
-
     data = []
     with open('dec2015-9.txt', 'r') as f:
         for cnt, line in enumerate(f):
@@ -444,11 +426,9 @@ def dec9_1():
 
 
 def dec10_1():
-    total = 0
-
-    data = []
     inp = '1113122113'
     print(inp)
+    output = ''
     for x in range(50):
         output = ''
         last_char = ''
@@ -470,9 +450,6 @@ def dec10_1():
 
 
 def dec11_1():
-    total = 0
-
-    data = []
     pwd = 'hepxcrrq'
 
     while True:
@@ -608,7 +585,7 @@ def dec13_1():
     print(names)
     perms = itertools.permutations(names)
     print(perms)
-    i=0
+    i = 0
     max_happiness = 0
     for perm in perms:
 
@@ -629,7 +606,7 @@ def dec13_1():
         if happiness > max_happiness:
             max_happiness = happiness
 
-        i+=1
+        i += 1
     print(max_happiness)
 
 
@@ -712,6 +689,7 @@ def get_score(ing, quantities):
     if cal_total != 500:
         score = 0
     return score
+
 
 def dec15_1():
     ing = [{'name': 'Sprinkles', 'capacity': 5, 'durability': -1, 'flavor': 0, 'texture': 0, 'calories': 5},
@@ -825,7 +803,7 @@ def dec19_1():
     replace2 = {}
     for d in data:
         match = regex.match(d)
-        #print(match.group(1), match.group(2))
+        # print(match.group(1), match.group(2))
         answer = match.group(2)
         cell = answer[0]
         answers = []
@@ -855,14 +833,13 @@ def dec19_1():
         if start[i:end] not in replace:
             end += 1
         if start[i:end] not in replace:
-           continue
+            continue
         molecule = start[i:end]
 
         for match in replace[molecule]:
             match_str = start[:i] + match + start[end:]
             combinations[match_str] = 1
     print('Part 1', len(combinations))
-
 
     goal = []
     cell = start[0]
@@ -916,17 +893,17 @@ def dec19_1():
     print()
     print("Part 2=", total - parens - 2 * commas - 1)
 
-from functools import reduce
 
 def factors(n):
     return set(reduce(list.__add__,
-                ([i, n//i] for i in range(1, int(n**0.5) + 1) if n % i == 0)))
+                      ([i, n//i] for i in range(1, int(n**0.5) + 1) if n % i == 0)))
+
 
 def factor_sum(number):
     fsum = 0
     for f in factors(number):
         if number/f <= 50:
-        # print(f)
+            # print(f)
             fsum += f
     # fsum = 0
     # for i in range(1, number + 1):
@@ -934,8 +911,8 @@ def factor_sum(number):
     #         fsum += i
     return fsum
 
+
 def dec20():
-    data = []
     input = 34000000
     sum = 0
     number = 1
@@ -958,6 +935,7 @@ def dec20():
             print('ANSWER', number)
             break
 
+
 def is_winner(boss, damage, armor):
     boss_life = boss['hp']
     boss_armor = boss['armor']
@@ -978,6 +956,7 @@ def is_winner(boss, damage, armor):
     if boss_life <= 0:
         return True
     return False
+
 
 def dec21():
 
@@ -1099,7 +1078,10 @@ def dec23():
 
     print(a, b)
 
+
 DP = {}
+
+
 def match(target, packed, remaining):
     key = (target, packed, remaining)
     print(key)
@@ -1109,9 +1091,9 @@ def match(target, packed, remaining):
     for i in range(len(remaining)):
         (target, packed, remaining) = match(target, packed, remaining)
 
-
     DP[key] = '1'
     return key
+
 
 def dec24():
     data = []
@@ -1143,10 +1125,12 @@ def dec24():
             print(qe, min_qe, p)
             possibilities.append(p)
             if qe < min_qe:
-                min_qe = qe  #11266889531
+                min_qe = qe  # 11266889531
     print(possibilities)
     min_qe = 999999999999999
     for i in range(len(possibilities)):
+        works = False
+        j = 0
         for j in range(i+1, len(possibilities)):
             first_pos = possibilities[i]
             works = True
@@ -1190,7 +1174,8 @@ def dec25():
     code = 20151125
     for i in range(cell):
         code = (code * 252533) % 33554393
-    print(i, code)
+    print('Part 1', code)
+
 
 if __name__ == '__main__':
     dec25()
