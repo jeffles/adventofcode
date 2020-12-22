@@ -1099,6 +1099,82 @@ def dec23():
 
     print(a, b)
 
+DP = {}
+def match(target, packed, remaining):
+    key = (target, packed, remaining)
+    print(key)
+    if key in DP:
+        return DP[key]
+
+    for i in range(len(remaining)):
+        (target, packed, remaining) = match(target, packed, remaining)
+
+
+    DP[key] = '1'
+    return key
+
+def dec24():
+    data = []
+    with open('input.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            data.append(int(line.strip()))
+
+    data.sort(reverse=True)
+    print(data)
+    sum = 0
+    for d in data:
+        sum += d
+
+    target = int(sum/4)
+    # target = 516
+
+    min_qe = 999999999999999
+
+    pool = itertools.combinations(data, 5)
+
+    possibilities = []
+    for p in pool:
+        sum = 0
+        qe = 1
+        for x in p:
+            sum += x
+            qe *= x
+        if sum == target:
+            print(qe, min_qe, p)
+            possibilities.append(p)
+            if qe < min_qe:
+                min_qe = qe  #11266889531
+    print(possibilities)
+    min_qe = 999999999999999
+    for i in range(len(possibilities)):
+        for j in range(i+1, len(possibilities)):
+            first_pos = possibilities[i]
+            works = True
+            for x in first_pos:
+                second_pos = possibilities[j]
+                if x in second_pos:
+                    works = False
+                    break
+        if works:
+            print('Yes?', possibilities[i], possibilities[j])
+            qe = 1
+            for x in possibilities[i]:
+                qe *= x
+            print(qe)
+            if qe < min_qe:
+                min_qe = qe
+            qe = 1
+            for x in possibilities[j]:
+                qe *= x
+            if qe < min_qe:
+                min_qe = qe
+            print(qe)
+    print(min_qe)
+
+    print(len(data))
+    print(target)
+    print(data)
+    # answer = match(target, (), tuple(data))
 
 # class TestAll(unittest.TestCase):
 #     def test_dec5_ids(self):
@@ -1109,4 +1185,4 @@ def dec23():
 
 if __name__ == '__main__':
     # unittest.main()
-    dec23()
+    dec24()
