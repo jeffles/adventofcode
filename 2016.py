@@ -1,4 +1,5 @@
 # coding=utf-8
+import copy
 import hashlib
 import re
 import operator
@@ -274,7 +275,365 @@ def dec6():
     print('Part 2:', part2)
 
 
+def dec7():
+    data = []
+    with open('input.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            data.append(line.strip())
+
+    validIPs = 0
+    for line in data:
+        insideValid = True
+        outsideValue = False
+        # print(line)
+        while line:
+            try:
+                outside, line = line.split('[', 1)
+                inside, line = line.split(']', 1)
+            except ValueError:
+                outside = line
+                line = ''
+            for i in range(len(outside)-3):
+                if (outside[i] != outside[i+1] and outside[i] == outside[i+3] and outside[i+1] == outside[i+2]):
+                    outsideValue = True
+            for i in range(len(inside)-3):
+                if (inside[i] != inside[i+1] and inside[i] == inside[i+3] and inside[i+1] == inside[i+2]):
+                    insideValid = False
+        if insideValid and outsideValue:
+            validIPs += 1
+    print('Part 1:', validIPs)
+
+    validIPs = 0
+    for line in data:
+        abas = []
+        babs = []
+        # print(line)
+        while line:
+            try:
+                outside, line = line.split('[', 1)
+                inside, line = line.split(']', 1)
+            except ValueError:
+                outside = line
+                inside = ''
+                line = ''
+            for i in range(len(outside)-2):
+                if (outside[i] != outside[i+1] and outside[i] == outside[i+2]):
+                    abas.append(outside[i:i+3])
+            for i in range(len(inside)-2):
+                if (inside[i] != inside[i+1] and inside[i] == inside[i+2]):
+                    babs.append(inside[i:i+3])
+        # print(abas, babs)
+        for aba in abas:
+            bab = aba[1] + aba[0] + aba[1]
+            # print('trying', aba, bab)
+            if bab in babs:
+                # print('Valid?!', aba, bab)
+                validIPs += 1
+                break
+    print('Part 2:', validIPs)
+
+
+def dec8():
+    row = ['.'] * 50
+    grid = []
+    for _ in range(6):
+        grid.append(copy.deepcopy(row))
+
+    data = []
+    with open('input.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            data.append(line.strip())
+
+    for line in data:
+        # print(line)
+        if line[:4] == 'rect':
+            ysize = int(line[-1:])
+            xsize = int(line[-4:-2])
+            for y in range(ysize):
+                for x in range(xsize):
+                    grid[y][x] = '#'
+        elif line[:10] == 'rotate row':
+            part2 = line.split('=')[1]
+            y, shift = part2.split(' by ')
+            y = int(y)
+            shift = int(shift)
+            grid[y] = grid[y][shift*-1:] + grid[y][:shift*-1]
+        elif line[:13] == 'rotate column':
+            part2 = line.split('=')[1]
+            x, shift = part2.split(' by ')
+            x = int(x)
+            shift = int(shift)
+            while shift:
+                shift -= 1
+                temp = copy.deepcopy(grid[-1][x])
+                for y in range(len(grid)-1, 0, -1):
+                    grid[y][x] = copy.deepcopy(grid[y-1][x])
+                grid[0][x] = temp
+            # grid[y] = grid[y][shift*-1:] + grid[y][:shift*-1]
+
+    for row in grid:
+        for cell in row:
+            print(cell, end='')
+        print()
+        #AFBUPZBJPS
+    lit = 0
+    for row in grid:
+        for cell in row:
+            if cell == '#':
+                lit += 1
+    print(lit)
+
+
+def get_length(line):
+    regex = re.compile('^\((\d+)x(\d+)\)(.*)')
+    length = 0
+    while line:
+        match = regex.match(line)
+        if match:
+            size = int(match.group(1))
+            times = int(match.group(2))
+            substr = match.group(3)
+            length += times * get_length(substr[:size])
+            line = substr[size:]
+            # my_output += substr * times
+        else:
+            length += 1
+            line = line[1:]
+    return length
+
+
+def dec9():
+    output = ''
+    data = []
+    with open('input.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            data.append(line.strip())
+
+    regex = re.compile('^\((\d+)x(\d+)\)(.*)')
+    for line in data:
+
+        my_output = ''
+        while line:
+            match = regex.match(line)
+            if match:
+                size = int(match.group(1))
+                times = int(match.group(2))
+                line = match.group(3)[size:]
+                substr = match.group(3)[:size]
+                my_output += substr * times
+
+            else:
+                my_output += line[0]
+                line = line[1:]
+        # print(len(my_output), my_output)
+        output += my_output
+
+    print('Part 1', len(output))
+
+    length = 0
+    for line in data:
+        length += get_length(line)
+
+    print('Part 2', length)
+
+
+class Bot:
+    def __init__(self, id):
+        self.id = id
+        self.value = []
+        self.low = None
+        self.high = None
+
+    def __repr__(self):
+        output = " ".join(str(x) for x in self.value)
+        if self.low:
+            output += " L:" + str(self.low.id)
+        if self.high:
+            output += " H:" + str(self.high.id)
+        return output
+
+    def add_val(self, val):
+        self.value.append(val)
+        if len(self.value) == 2:
+            self.high.add_val(max(self.value))
+            self.low.add_val(min(self.value))
+
+
+def dec10():
+    data = []
+    bots = {}
+    output = {}
+    with open('input.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            data.append(line.strip())
+
+    bot_regex = re.compile('bot (\d+) gives low to (.*) and high to (.*)')
+    for line in data:
+        bot_match = bot_regex.match(line)
+        if bot_match:
+            bot = int(bot_match.group(1))
+            low = bot_match.group(2)
+            (low_type, low_value) = low.split(" ")
+            low_value = int(low_value)
+            high = bot_match.group(3)
+            (high_type, high_value) = high.split(" ")
+            high_value = int(high_value)
+            if bot not in bots:
+                bots[bot] = Bot(bot)
+            if low_type == 'bot':
+                if low_value not in bots:
+                    bots[low_value] = Bot(low_value)
+                bots[bot].low = bots[low_value]
+            else:
+                if low_value not in output:
+                    output[low_value] = Bot(low_value)
+                bots[bot].low = output[low_value]
+
+            if high_type == 'bot':
+                if high_value not in bots:
+                    bots[high_value] = Bot(high_value)
+                bots[bot].high = bots[high_value]
+            else:
+                if high_value not in output:
+                    output[high_value] = Bot(high_value)
+                bots[bot].high = output[high_value]
+
+
+    val_regex = re.compile('value (\d+) goes to bot (\d+)')
+    for line in data:
+        val_match = val_regex.match(line)
+        if val_match:
+            bot = int(val_match.group(2))
+            val = int(val_match.group(1))
+            if bot not in bots:
+                bots[bot] = Bot(bot)
+            bots[bot].add_val(val)
+
+    for id, bot in bots.items():
+        #print('My id is', id, 'Bot is ', bot)
+        if max(bot.value) == 61 and min(bot.value) == 17:
+            print('Part 1', bot.id)
+    # print(bots)
+    # print ('OUTPUT')
+    # for id, bot in output.items():
+    #     print('My id is', id, 'Bot is ', bot)
+    print('Part 2: ', output[0].value[0] * output[1].value[0] * output[2].value[0])
+
+
+def dec11():
+    pass
+    # I just solved it manually with a deck of cards in 5 minutes.
+    # Move 2 up, move 1 down... repeat.
+
+
+def dec12():
+    data = []
+    with open('input.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            data.append(line.strip())
+    mem = {'a': 0, 'b': 0, 'c': 0, 'd': 0}
+    i = 0
+    while i < len(data):
+        line = data[i]
+        # print(line, mem)
+        i += 1
+        if line[0:3] == 'inc':
+            mem[line[4]] += 1
+        elif line[0:3] == 'cpy':
+            (fr, to) = line[4:].split(" ")
+            if fr in ('abcd'):
+                mem[to] = mem[fr]
+            else:
+                mem[to] = int(fr)
+        elif line[0:3] == 'dec':
+            mem[line[4]] -= 1
+        elif line[0:3] == 'jnz':
+            (fr, to) = line[4:].split(" ")
+            if fr in 'abcd':
+                if mem[fr] == 0:
+                    continue
+            else:
+                if int(fr) == 0:
+                    continue
+            i += int(to) - 1
+        else:
+            print('ERROR', line)
+
+
+    print(mem)
+
+maze = []
+maze_dp = {}
+
+def solve_maze(x, y, steps):
+    global maze
+    global maze_dp
+    # print ('MAZE', x, y, steps)
+    # for dy in maze:
+    #     print()
+    #     for dx in dy:
+    #         print(f'{dx: <{4}}', end='')
+    print('-----')
+    if (x, y) in maze_dp and steps >= maze_dp[(x, y)]:
+        return
+    if x == 2:
+        print(x, y)
+    maze_dp[(x, y)] = steps
+    maze[y][x] = steps
+    steps += 1
+    for x_dif, y_dif in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+        if x + x_dif < 0:
+            continue
+        elif y + y_dif < 0:
+            continue
+        elif x + x_dif >= len(maze[0]):
+            continue
+        elif y + y_dif >= len(maze):
+            continue
+        elif maze[y+y_dif][x+x_dif] != '#':
+            solve_maze(x+x_dif, y+y_dif, steps)
+
+
+def dec13():
+    global maze
+    favorite = 1364
+    for y in range(50):
+        maze.append([])
+        for x in range(50):
+            my_num = x*x + 3*x + 2*x*y + y + y*y + favorite
+            my_bin = bin(my_num)
+            my_str = str(my_bin)
+            # print(my_bin, my_str)
+            count = 0
+            for c in my_str[2:]:
+                if c == '1':
+                    count += 1
+            if count % 2 == 0:
+                maze[y].append('.')
+            else:
+                maze[y].append('#')
+
+    solve_maze(1, 1, 0)
+
+    for y in maze:
+        print()
+        for x in y:
+            print(f'{x: <{3}}', end='')
+
+
+    print()
+    print("trial", maze[4][7])
+    print("part 1", maze[39][31])
+    part2  = 0
+    for y in maze:
+        for x in y:
+            if x == '.' or x == '#':
+                continue
+            if x <= 50:
+                part2 += 1
+    print('Part 2', part2)
+
 
 
 if __name__ == '__main__':
-    dec6()
+    dec13()
