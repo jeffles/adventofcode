@@ -146,6 +146,7 @@ class Letter:
     def add(self):
         self.count += 1
 
+
 def is_real(code):
     regex = re.compile('^(.+)-(\d+)\[(.+?)\]$')
     match = regex.match(code)
@@ -498,7 +499,6 @@ def dec10():
                     output[high_value] = Bot(high_value)
                 bots[bot].high = output[high_value]
 
-
     val_regex = re.compile('value (\d+) goes to bot (\d+)')
     for line in data:
         val_match = val_regex.match(line)
@@ -510,7 +510,7 @@ def dec10():
             bots[bot].add_val(val)
 
     for id, bot in bots.items():
-        #print('My id is', id, 'Bot is ', bot)
+        # print('My id is', id, 'Bot is ', bot)
         if max(bot.value) == 61 and min(bot.value) == 17:
             print('Part 1', bot.id)
     # print(bots)
@@ -559,11 +559,12 @@ def dec12():
         else:
             print('ERROR', line)
 
-
     print(mem)
+
 
 maze = []
 maze_dp = {}
+
 
 def solve_maze(x, y, steps):
     global maze
@@ -620,7 +621,6 @@ def dec13():
         for x in y:
             print(f'{x: <{3}}', end='')
 
-
     print()
     print("trial", maze[4][7])
     print("part 1", maze[39][31])
@@ -634,6 +634,172 @@ def dec13():
     print('Part 2', part2)
 
 
+enc = {}
+
+
+def get_enc(input, index):
+    global enc
+    enc_str = input + str(index)
+    if enc_str in enc:
+        return enc[enc_str]
+    result = hashlib.md5(enc_str.encode())
+    hexstr = result.hexdigest()
+    # print(hexstr)
+    for _ in range(2016):
+        result = hashlib.md5(hexstr.encode())
+        hexstr = result.hexdigest()
+    enc[enc_str] = hexstr
+    return hexstr
+
+
+def check_1000(input, index, target):
+    for i in range(index+1, index+1000):
+        enc_str = input + str(i)
+        result = hashlib.md5(enc_str.encode())
+        hexstr = result.hexdigest()
+        for j in range(len(hexstr) - 5):
+            if target == hexstr[j] == hexstr[j + 1] == hexstr[j + 2] == hexstr[j + 3] == hexstr[j + 4]:
+                # print(target, i, enc_str,  hexstr[j:j+5])
+                return True
+    return False
+
+
+def check_1000_64(input, index, target):
+    global enc
+    for i in range(index+1, index+1000):
+        hexstr = get_enc(input, i)
+        for j in range(len(hexstr) - 5):
+            if target == hexstr[j] == hexstr[j + 1] == hexstr[j + 2] == hexstr[j + 3] == hexstr[j + 4]:
+                # print(target, i, enc_str,  hexstr[j:j+5])
+                return True
+    return False
+
+
+def dec14():
+    input = 'ihaygndm'
+
+    index = 0
+    found = 0
+    found_i = 0
+    while found < 64:
+        enc_str = input + str(index)
+        result = hashlib.md5(enc_str.encode())
+        hexstr = result.hexdigest()
+        for i in range(len(hexstr)-2):
+            if hexstr[i] == hexstr[i+1] == hexstr[i+2]:
+                # print('Checking ', index)
+                if check_1000(input, index, hexstr[i]):
+                    found += 1
+                    found_i = index
+                    # print('Valid', index, i, hexstr, enc_str, found)
+                break
+        index += 1
+    print('Part 1:', found_i)
+
+    index = 0
+    found = 0
+    found_i = 0
+    while found < 64:
+        hexstr = get_enc(input, index)
+
+        for i in range(len(hexstr)-2):
+            if hexstr[i] == hexstr[i+1] == hexstr[i+2]:
+                # print('Checking ', index)
+                if check_1000_64(input, index, hexstr[i]):
+                    found += 1
+                    found_i = index
+                    print('Valid', index, i, hexstr, input, index, found)
+                break
+        index += 1
+    print('Part 2:', found_i)
+
+
+def dec15():
+    # Disc  # 1 has 17 positions; at time=0, it is at position 15.
+    # Disc  # 2 has 3 positions; at time=0, it is at position 2.
+    # Disc  # 3 has 19 positions; at time=0, it is at position 4.
+    # Disc  # 4 has 13 positions; at time=0, it is at position 2.
+    # Disc  # 5 has 7 positions; at time=0, it is at position 2.
+    # Disc  # 6 has 5 positions; at time=0, it is at position 0.
+    discs = [(17, 15), (3, 2), (19, 4), (13, 2), (7, 2), (5, 0), (11, 0)]
+    positions, position = discs[0]
+    disc = 0
+    time = 0
+    increment = 1
+    while True:
+        time += increment
+        if (position + time + disc + 1) % positions == 0:
+            increment *= positions
+            print('Match', time)
+            disc += 1
+            positions, position = discs[disc]
+
+
+def dec16():
+    start = '10001001100000001'
+    target_length = 35651584
+    data = []
+    for c in start:
+        data.append(c)
+
+    while len(data) < target_length:
+        rev_data = data[::-1]
+        for i in range(len(rev_data)):
+            if rev_data[i] == '0':
+                rev_data[i] = '1'
+            else:
+                rev_data[i] = '0'
+        data.append('0')
+        data = data + rev_data
+
+    data = data[:target_length]
+    # for d in data:
+    #     print(d, end='')
+    # print()
+
+    while len(data) % 2 == 0:
+        new_data = []
+        for i in range(0, len(data), 2):
+            if data[i] == data[i+1]:
+                new_data.append('1')
+            else:
+                new_data.append('0')
+        data = new_data
+    for d in data:
+        print(d, end='')
+    print()
+
+
+def dec17():
+    passcode = 'lpvhkcbi'
+    paths = [('', 0, 0)]
+    part1 = True
+    part2 = 0
+    while paths:
+        path, x, y = paths.pop(0)
+        enc_str = passcode + path
+
+        result = hashlib.md5(enc_str.encode())
+        code = result.hexdigest()[:4]
+        # print(path, enc_str, x, y, code)
+        if x == 3 and y == 3:
+            if part1:
+                print('Part 1:', path)
+                part1 = False
+            else:
+                part2 = len(path)
+            continue
+        if y > 0 and code[0] in 'bcdef':
+            paths.append((path + 'U', x, y-1))
+        if y < 3 and code[1] in 'bcdef':
+            paths.append((path + 'D', x, y + 1))
+        if x > 0 and code[2] in 'bcdef':
+            paths.append((path + 'L', x - 1 , y))
+        if x < 3 and code[3] in 'bcdef':
+            paths.append((path + 'R', x + 1, y))
+
+    print('Part 2:', part2)
+
 
 if __name__ == '__main__':
-    dec13()
+    dec17()
