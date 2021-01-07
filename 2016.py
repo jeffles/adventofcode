@@ -1,6 +1,8 @@
 # coding=utf-8
+import collections
 import copy
 import hashlib
+import math
 import re
 import operator
 
@@ -801,5 +803,392 @@ def dec17():
     print('Part 2:', part2)
 
 
+def dec18():
+    maze = []
+    row = '.^..^....^....^^.^^.^.^^.^.....^.^..^...^^^^^^.^^^^.^.^^^^^^^.^^^^^..^.^^^.^^..^.^^.^....^.^...^^.^.'
+    # row = '.^^.^.^^^^'
+    maze.append(row)
+    while len(maze) < 40:
+        row = maze[-1]
+        row += '.'
+        new_row = ''
+        for i in range(len(row)-1):
+            if row[i-1] == '^' and row[i] == '^' and row[i+1] == '.':
+                new_row += '^'
+            elif row[i-1] == '.' and row[i] == '^' and row[i+1] == '^':
+                new_row += '^'
+            elif row[i-1] == '^' and row[i] == '.' and row[i+1] == '.':
+                new_row += '^'
+            elif row[i-1] == '.' and row[i] == '.' and row[i+1] == '^':
+                new_row += '^'
+            else:
+                new_row += '.'
+        maze.append(new_row)
+    for m in maze:
+        print(m)
+    count = 0
+    for m in maze:
+        for t in m:
+            if t == '.':
+                count += 1
+    print(count)
+
+    new_row = '.^..^....^....^^.^^.^.^^.^.....^.^..^...^^^^^^.^^^^.^.^^^^^^^.^^^^^..^.^^^.^^..^.^^.^....^.^...^^.^.'
+    # row = '.^^.^.^^^^'
+
+    safe = 0
+    for c in new_row:
+        if c == '.':
+            safe += 1
+    for _ in range(400000 - 1):
+        row = new_row
+        # print(row)
+        row += '.'
+        new_row = ''
+        for i in range(len(row)-1):
+            if row[i-1] == '^' and row[i] == '^' and row[i+1] == '.':
+                new_row += '^'
+            elif row[i-1] == '.' and row[i] == '^' and row[i+1] == '^':
+                new_row += '^'
+            elif row[i-1] == '^' and row[i] == '.' and row[i+1] == '.':
+                new_row += '^'
+            elif row[i-1] == '.' and row[i] == '.' and row[i+1] == '^':
+                new_row += '^'
+            else:
+                new_row += '.'
+                safe += 1
+
+    print('Part 2', safe)
+
+
+def dec19():
+    num_elfs = 5
+    num_elfs = 3004953
+    list = []
+    for i in range(num_elfs):
+        list.append(1)
+
+    index = 0
+    while True:
+        taker = index
+        num_takes = 0
+        while num_takes == 0:
+            index += 1
+            if index >= len(list):
+                index = 0
+            if list[index] != 0:
+                num_takes = list[index]
+                list[index] = 0
+        list[taker] += num_takes
+        #print(list)
+        print(taker, list[taker])
+        if list[taker] == num_elfs:
+            print('part 1', taker + 1)
+            break
+        while list[index] == 0:
+            index += 1
+            if index >= len(list):
+                index = 0
+
+
+def dec19_2():
+    num_elfs = 100
+    num_elfs = 3004953
+    list = []
+    for i in range(num_elfs):
+        list.append(i+1)
+
+    # index = 0
+    # while True:
+    #     taken = (math.floor(len(list) / 2) + index ) % len(list)
+    #     # print('Bye', len(list), list[index], list[taken])
+    #     if list[index] == 1410630 or list[taken] == 1410630:
+    #         print('Bye', len(list), list[index], list[taken])
+    #     list.pop(taken)
+    #     if len(list) == 1:
+    #         break
+    #     index += 1
+    #     if index >= len(list):
+    #         index = 0
+    # print(list)
+
+    left = collections.deque()
+    right = collections.deque()
+    for i in range(1, num_elfs+1):
+        if i < (num_elfs // 2) + 1:
+            left.append(i)
+        else:
+            right.appendleft(i)
+
+    while left and right:
+        if len(left) > len(right):
+            left.pop()
+        else:
+            right.pop()
+
+        # rotate
+        right.appendleft(left.popleft())
+        left.append(right.pop())
+    answer = left[0] or right[0]
+    print(answer)
+
+
+def dec20():
+    data = []
+    with open('input.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            data.append(line.strip())
+    data.sort()
+    for i in range(len(data)):
+        low, high = data[i].split('-')
+        low = int(low)
+        high = int(high)
+        data[i] = (low, high)
+    data.sort()
+    min = 0
+    index = 0
+    while data[index][0] <= min:
+        if (data[index][1] + 1) > min:
+            min = data[index][1] + 1
+        index += 1
+    print(data)
+    print('Part 1', min)
+
+    min = 0
+    index = 0
+    allowed = 0
+    while min <= 4294967295:
+        while index < len(data) and data[index][0] <= min:
+            if (data[index][1] + 1) > min:
+                min = data[index][1] + 1
+            index += 1
+        print(min, data[index-1], data[index], data[index+1])
+        allowed += 1
+        min += 1
+    print('Part 2', allowed)
+
+def dec22():
+    data = []
+    nodes = []
+    avail = []
+    size = []
+    grid = []
+    with open('input.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            data.append(line.strip())
+    data.pop(0)
+    data.pop(0)
+    regex = re.compile('x(\d+).y(\d+)\s+(\d+)T\s+(\d+)T\s+(\d+)T\s+(\d+)')
+    for l in data:
+        match = regex.search(l)
+        node = {'x': int(match.group(1)), 'y': int(match.group(2)), 'size': int(match.group(3)), 'used': int(match.group(4)), 'avail': int(match.group(5)), 'use': int(match.group(6))}
+        if node['y'] == 0:
+            grid.append([])
+        avail.append(node['avail'])
+        size.append(node['used'])
+        nodes.append(node)
+    x = 0
+    for node in nodes:
+        if node['x'] != x:
+            x = node['x']
+            print()
+        if node['used'] > 100:
+            print('***** | ', end='')
+        else:
+            print(str(node['used']) + '/' + str(node['avail']) + " | ", end='')
+    print()
+    print('--------')
+    viable = 0
+    total = 0
+    for a in range(len(nodes)):
+        if nodes[a]['used'] == 0:
+            continue
+        for b in range(len(nodes)):
+            if a == b :
+                continue
+            total += 1
+            if nodes[a]['used'] <= nodes[b]['avail']:
+                viable += 1
+
+    avail.sort(reverse=True)
+    size.sort()
+    print(avail)
+    print(size)
+    print('Part 1', viable, total)
+
+
+def dec23():
+    import time
+    data = []
+    with open('input.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            data.append(line.strip())
+    mem = {'a': 12, 'b': 0, 'c': 0, 'd': 0}
+    i = 0
+    while i < len(data):
+        line = data[i]
+        # print(i, line, mem)
+        # time.sleep(3)
+        i += 1
+        if line[0:3] == 'inc':
+            mem[line[4]] += 1
+        elif line[0:3] == 'cpy':
+            (fr, to) = line[4:].split(" ")
+            if fr in ('abcd'):
+                mem[to] = mem[fr]
+            else:
+                mem[to] = int(fr)
+        elif line[0:3] == 'dec':
+            mem[line[4]] -= 1
+        elif line[0:3] == 'jnz':
+            (fr, to) = line[4:].split(" ")
+            if fr in 'abcd':
+                if mem[fr] == 0:
+                    continue
+            else:
+                if int(fr) == 0:
+                    continue
+            if to in 'abcd':
+                i += mem[to] - 1
+            else:
+                i += int(to) - 1
+        elif line[0:3] == 'tgl':
+            print(mem[line[4]])
+            tline = i + mem[line[4]] - 1
+            if tline >= len(data):
+                print('Outside program')
+                continue
+            if data[tline][0:3] == 'inc':
+                data[tline] = 'dec' + data[tline][3:]
+            elif data[tline][0:3] == 'dec':
+                data[tline] = 'inc' + data[tline][3:]
+            elif data[tline][0:3] == 'tgl':
+                data[tline] = 'inc' + data[tline][3:]
+            elif data[tline][0:3] == 'jnz':
+                data[tline] = 'cpy' + data[tline][3:]
+            else:
+                data[tline] = 'jnz' + data[tline][3:]
+            print(tline, data[tline])
+        else:
+            print('ERROR', line)
+
+    print(mem)
+    print('END', mem)
+    print('Give up on part 2 - it is input! + variable. In this case I just did solution1 - 7! + 12!')
+
+
+from collections import deque
+from itertools import permutations
+
+
+
+# find positions of characters in the map that are accepted by the predicate
+def find_in_map(mp, predicate):
+    return [(i, j) for i in range(len(mp)) for j in range(len(mp[i])) if predicate(mp[i][j])]
+
+# bfs distance from (y_fr,x_fr) to (y_to,x_to) assuming walls all around
+moves = set([(-1, 0), (1, 0), (0, 1), (0, -1)])
+
+def bfs_from_to(mp, fr, to):
+    q = deque([(0, fr)])
+    vis = set([fr])
+    while q:
+        dst, cur = q.pop()
+        if cur == to:
+            return dst
+        y, x = cur
+        for dy, dx in moves:
+            ny, nx = y + dy, x + dx
+            if mp[ny][nx] != '#' and (ny, nx) not in vis:
+                q.appendleft((dst + 1, (ny, nx)))
+                vis.add((ny, nx))
+    return -1
+
+def solve(inp):
+    zero_pos = find_in_map(inp, lambda x: x == '0')[0]
+    # find all non-zero positions
+    nums_pos = find_in_map(inp, lambda x: x in map(str, range(1, 10)))
+    # precompute distance from 0 to all other numbers
+    dst_0 = [bfs_from_to(inp, zero_pos, n_pos) for n_pos in nums_pos]
+    K = len(nums_pos)
+    # precompute all pairwise K^2 / 2 distances
+    dsts = [[None for j in range(K)] for i in range(K)]
+    for i in range(K):
+        for j in range(i + 1, K):
+            dsts[j][i] = dsts[i][j] = bfs_from_to(inp, nums_pos[i], nums_pos[j])
+    part1, part2 = 1e12, 1e12
+    # with all pairwise distances computed the problem is reduced to TSP
+    # O(K!) is terrible but good enough for K=7 :)
+    for path in permutations(range(K)):
+        dst = dst_0[path[0]]
+        for i in range(len(path) - 1):
+            dst += dsts[path[i]][path[i + 1]]
+        part1 = min(part1, dst)
+        dst += dst_0[path[-1]]
+        part2 = min(part2, dst)
+    return part1, part2
+
+def dec24():
+    inp = [line.strip() for line in open('input.txt').readlines()]
+    print(solve(inp))
+
+
+def dec25():
+
+    data = []
+    with open('input.txt', 'r') as f:
+        for cnt, line in enumerate(f):
+            data.append(line.strip())
+    astart = 0
+    mem = {'a': astart, 'b': 0, 'c': 0, 'd': 0}
+    i = 0
+    answer = []
+    while i < len(data):
+        if len(answer) == 12:
+            if answer == [0,1,0,1,0,1,0,1,0,1,0,1] or answer == [1,0,1,0,1,0,1,0,1,0,1,0]:
+                print(astart)
+                return
+            else:
+                answer = []
+                astart += 1
+                mem = {'a': astart, 'b': 0, 'c': 0, 'd': 0}
+                i = 0
+        line = data[i]
+        # print(i, line, mem)
+        # time.sleep(3)
+        i += 1
+        if line[0:3] == 'inc':
+            mem[line[4]] += 1
+        elif line[0:3] == 'cpy':
+            (fr, to) = line[4:].split(" ")
+            if fr in ('abcd'):
+                mem[to] = mem[fr]
+            else:
+                mem[to] = int(fr)
+        elif line[0:3] == 'dec':
+            mem[line[4]] -= 1
+        elif line[0:3] == 'jnz':
+            (fr, to) = line[4:].split(" ")
+            if fr in 'abcd':
+                if mem[fr] == 0:
+                    continue
+            else:
+                if int(fr) == 0:
+                    continue
+            if to in 'abcd':
+                i += mem[to] - 1
+            else:
+                i += int(to) - 1
+        elif line[0:3] == 'out':
+            print(mem[line[4]], mem)
+            answer.append(int(mem[line[4]]))
+
+
+    print(mem)
+    print('END', mem)
+    print('Give up on part 2 - it is input! + variable. In this case I just did solution1 - 7! + 12!')
+
+
+
 if __name__ == '__main__':
-    dec17()
+    dec25()
