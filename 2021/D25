@@ -1,0 +1,58 @@
+from collections.abc import Hashable
+import copy
+
+def part1():
+    global maze
+    # 0 = room
+    # 1 = wall
+    # 2- door
+    # 3- start
+
+    x = 0
+    y = 0
+    data = open('input').read().split('\n')
+    for i in range(len(data)):
+        data[i] = list(data[i])
+
+    moved = True
+    steps = 0
+    print('Iniital state:')
+    for d in data:
+        print(''.join(d))
+
+
+    while moved == True:
+        steps += 1
+        moved = False
+        print(f'Step {steps}')
+        new_data = copy.deepcopy(data)
+        for y in range(len(data)):
+            for x in range(len(data[0])):
+                next_x = (x+1) % len(data[y])
+                if data[y][x] == '>' and data[y][next_x] == '.':
+                    new_data[y][x] = '.'
+                    new_data[y][next_x] = '>'
+                    moved = True
+        data = copy.deepcopy(new_data)
+        # for d in data:
+        #     print(''.join(d))
+        # print('Second half')
+
+        for y in range(len(data)):
+            for x in range(len(data[0])):
+                next_y = (y+1) % len(data)
+                if data[y][x] == 'v' and data[next_y][x] == '.':
+                    new_data[y][x] = '.'
+                    new_data[next_y][x] = 'v'
+                    moved = True
+        data = copy.deepcopy(new_data)
+
+        print(f"After {steps} step")
+        for d in data:
+            print(''.join(d))
+
+
+
+if __name__ == '__main__':
+    # unittest.main()
+    part1()
